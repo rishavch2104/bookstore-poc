@@ -2,6 +2,36 @@ import gql from 'graphql-tag';
 
 export const typeDefs = gql`
   scalar Date
+
+  type Review {
+    id: ID!
+    bookId: Int!
+    userId: Int!
+    rating: Int!
+    title: String
+    body: String
+    createdAt: Date!
+    updatedAt: Date!
+    user: User!
+  }
+
+  type ReviewList {
+    nodes: [Review!]!
+    totalCount: Int!
+    hasNextPage: Boolean!
+  }
+
+  type RatingSummary {
+    count: Int!
+    average: Float!
+  }
+
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+  }
+
   type Author {
     id: ID!
     name: String!
@@ -17,6 +47,11 @@ export const typeDefs = gql`
     authorId: Int!
     author: Author!
     publishedDate: Date!
+  }
+
+  extend type Book {
+    ratingSummary: RatingSummary!
+    reviews(limit: Int = 10, offset: Int = 0): ReviewList!
   }
 
   type AuthorList {
@@ -131,6 +166,25 @@ export const typeDefs = gql`
     id: ID!
   }
 
+  input CreateReviewInput {
+    bookId: Int!
+    userId: Int!
+    rating: Int!
+    title: String
+    body: String
+  }
+
+  input UpdateReviewInput {
+    id: ID!
+    rating: Int
+    title: String
+    body: String
+  }
+
+  input DeleteReviewInput {
+    id: ID!
+  }
+
   type Mutation {
     createAuthor(input: CreateAuthorInput!): Author!
     updateAuthor(input: UpdateAuthorInput!): Author!
@@ -139,5 +193,15 @@ export const typeDefs = gql`
     createBook(input: CreateBookInput!): Book!
     updateBook(input: UpdateBookInput!): Book!
     deleteBook(input: DeleteBookInput!): Boolean!
+  }
+
+  extend type Query {
+    reviews(bookId: Int!, limit: Int = 10, offset: Int = 0): ReviewList!
+  }
+
+  extend type Mutation {
+    createReview(input: CreateReviewInput!): Review!
+    updateReview(input: UpdateReviewInput!): Review!
+    deleteReview(input: DeleteReviewInput!): Boolean!
   }
 `;

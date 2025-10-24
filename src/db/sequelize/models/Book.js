@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../sequelize.js';
+import { sequelize } from '../db.js';
 
 export class Book extends Model {}
 

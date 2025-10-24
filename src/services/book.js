@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
-import { Book, Author } from '../db/models/index.js';
-import { sequelize } from '../db/sequelize.js';
+import { Book, Author } from '../db/sequelize/models/index.js';
+import { sequelize } from '../db/sequelize/db.js';
 import { buildAuthorWhere, buildBookWhere } from './filters.js';
 
 function buildBookOrder(orderBy = []) {

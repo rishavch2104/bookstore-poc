@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
-import { Author, Book } from '../db/models/index.js';
-import { sequelize } from '../db/sequelize.js';
+import { Author, Book } from '../db/sequelize/models/index.js';
+import { sequelize } from '../db/sequelize/db.js';
 import { Op } from 'sequelize';
 
 import { buildBookWhere, buildAuthorWhere } from './filters.js';

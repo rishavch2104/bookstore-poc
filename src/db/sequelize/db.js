@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-import { config } from '../config/index.js';
+import { config } from '../../config/index.js';
 
 export const sequelize = new Sequelize(config.db.uri, {
   dialect: 'postgres',
