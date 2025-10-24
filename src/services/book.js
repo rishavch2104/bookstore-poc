@@ -1,10 +1,63 @@
 import { GraphQLError } from 'graphql';
 import { Book, Author } from '../db/models/index.js';
 import { sequelize } from '../db/sequelize.js';
+import { buildAuthorWhere, buildBookWhere } from './filters.js';
+
+function buildBookOrder(orderBy = []) {
+  if (!orderBy?.length) return [['id', 'ASC']];
+  const mapField = (f) => {
+    switch (f) {
+      case 'ID':
+        return 'id';
+      case 'TITLE':
+        return 'title';
+      case 'AUTHOR_ID':
+        return 'authorId';
+      case 'PUBLISHED_DATE':
+        return 'publishedDate';
+      case 'CREATED_AT':
+        return 'createdAt';
+      case 'UPDATED_AT':
+        return 'updatedAt';
+      default:
+        return 'id';
+    }
+  };
+  return orderBy.map(({ field, direction }) => [
+    mapField(field),
+    direction || 'ASC',
+  ]);
+}
 
 export const BookService = {
-  async list() {
-    return Book.findAll();
+  async list({ limit = 20, offset = 0, filter, orderBy } = {}) {
+    const where = buildBookWhere(filter);
+    const order = buildBookOrder(orderBy);
+
+    const include = [];
+    if (filter?.author) {
+      include.push({
+        model: Author,
+        as: 'author',
+        where: buildAuthorWhere(filter.author),
+        required: true,
+        attributes: [],
+      });
+    }
+
+    const { rows, count } = await Book.findAndCountAll({
+      where,
+      include,
+      order,
+      limit,
+      offset,
+      distinct: true,
+    });
+    return {
+      nodes: rows,
+      totalCount: count,
+      hasNextPage: offset + rows.length < count,
+    };
   },
 
   async get(id) {

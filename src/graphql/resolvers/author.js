@@ -2,7 +2,7 @@ import { AuthorService } from '../../services/author.js';
 
 export const authorResolvers = {
   Query: {
-    authors: () => AuthorService.list(),
+    authors: (_, args) => AuthorService.list(args),
     author: (_, { id }) => AuthorService.get(id),
   },
 

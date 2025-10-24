@@ -1,8 +1,10 @@
 import { authorResolvers } from './author.js';
 import { bookResolvers } from './book.js';
 import { wrapQueryResolversWithNotFound } from '../utils/wrapQueries.js';
+import { DateScalar } from './dateScalar.js';
 
 const base = {
+  Date: DateScalar,
   Query: {
     ...authorResolvers.Query,
     ...bookResolvers.Query,
