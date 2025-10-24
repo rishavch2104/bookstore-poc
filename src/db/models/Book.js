@@ -7,9 +7,9 @@ Book.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     title: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.STRING, allowNull: false },
     authorId: { type: DataTypes.INTEGER, allowNull: false },
-    publishedYear: { type: DataTypes.INTEGER },
-    genre: { type: DataTypes.STRING, allowNull: false },
+    publishedDate: { type: DataTypes.DATE, allowNull: false },
   },
   {
     sequelize,

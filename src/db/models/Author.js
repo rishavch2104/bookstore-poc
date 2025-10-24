@@ -8,6 +8,7 @@ Author.init(
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
     bio: { type: DataTypes.TEXT },
+    dateOfBirth: { type: DataTypes.DATE, allowNull: false },
   },
   {
     sequelize,

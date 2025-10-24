@@ -2,7 +2,7 @@ import { BookService } from '../../services/book.js';
 
 export const bookResolvers = {
   Query: {
-    books: () => BookService.list(),
+    books: (_, args) => BookService.list(args),
     book: (_, { id }) => BookService.get(id),
   },
 
