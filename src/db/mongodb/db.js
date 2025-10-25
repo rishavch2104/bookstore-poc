@@ -1,9 +1,7 @@
 import mongoose from 'mongoose';
-
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/booksdb';
 
 function initMongo() {
-  // connect only if not already connected
   if (mongoose.connection.readyState === 0) {
     mongoose.connect(MONGO_URI, {
       autoIndex: true,
@@ -26,6 +24,4 @@ function initMongo() {
   return mongoose;
 }
 
-// Call once and export the ready-to-use instance
-const mongo = initMongo();
-export default mongo;
+export const mongo = initMongo();

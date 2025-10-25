@@ -65,3 +65,19 @@ export function buildAuthorWhere(filter = {}) {
 
   return where;
 }
+
+export function buildUserWhere(filter = {}) {
+  const where = {};
+  if (filter?.id != null) where.id = { [Op.eq]: filter.id };
+  if (filter?.name != null) where.name = { [Op.eq]: filter.name };
+  if (filter?.userName != null) where.userName = { [Op.eq]: filter.userName };
+
+  const from = filter?.createdAtFrom;
+  const to = filter?.createdAtTo;
+  if (from != null && to != null)
+    where.createdAt = { [Op.between]: [from, to] };
+  else if (from != null) where.createdAt = { [Op.gte]: from };
+  else if (to != null) where.createdAt = { [Op.lte]: to };
+
+  return where;
+}
