@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/booksdb';
-
+import { config } from '../../config/index.js';
+const MONGO_URI = config.db.mongouri;
 function initMongo() {
   if (mongoose.connection.readyState === 0) {
     mongoose.connect(MONGO_URI, {

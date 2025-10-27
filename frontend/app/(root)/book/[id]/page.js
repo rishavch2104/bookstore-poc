@@ -5,6 +5,7 @@ import { gql } from '@apollo/client';
 import { getClient } from '../../../lib/apolloClient.js';
 import { formatDate } from '@/lib/utils';
 import Image from 'next/image';
+import { Star } from 'lucide-react';
 
 const GET_BOOK = gql`
   query GetBookWithReviewsPage($id: ID!, $limit: Int!, $offset: Int!) {
@@ -104,17 +105,18 @@ export default async function Page({ params }) {
         <p className="tag">{formatDate(book.publishedDate)}</p>
         <h1 className="heading">{book.title}</h1>
 
-        {/* Rating Summary */}
         {book.ratingSummary && (
-          <div className="flex items-center gap-2 mt-4">
-            <span className="text-yellow-500 text-2xl">★</span>
-            <p className="text-lg font-medium">
-              {book.ratingSummary.average.toFixed(1)} / 5.0
-            </p>
-            <p className="text-black-500 text-sm">
-              ({book.ratingSummary.count}{' '}
-              {book.ratingSummary.count === 1 ? 'review' : 'reviews'})
-            </p>
+          <div className="mt-6 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white px-6 py-3 rounded-xl shadow-md inline-flex items-center justify-center">
+            <div className="flex items-center gap-3">
+              <Star className="text-yellow-500 w-6 h-6 fill-yellow-500" />
+              <p className="text-lg font-semibold">
+                {book.ratingSummary.average.toFixed(1)} / 5.0
+              </p>
+              <p className="text-lg font-semibold">
+                ({book.ratingSummary.count}{' '}
+                {book.ratingSummary.count === 1 ? 'review' : 'reviews'})
+              </p>
+            </div>
           </div>
         )}
       </section>

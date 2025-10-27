@@ -8,5 +8,6 @@ export const config = {
       process.env.DATABASE_URL ||
       'postgres://myuser:mypassword@localhost:5432/mydatabase',
     logging: process.env.DB_LOGGING === 'true',
+    mongouri: process.env.MONGODB_URI || 'mongodb://localhost:27017/booksdb',
   },
 };
