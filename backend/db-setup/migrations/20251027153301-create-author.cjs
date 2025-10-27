@@ -11,12 +11,15 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false, // Set to be required
       },
       bio: {
         type: Sequelize.STRING,
+        allowNull: false, // Set to be required
       },
       dateOfBirth: {
         type: Sequelize.DATE,
+        allowNull: false, // Set to be required
       },
       createdAt: {
         allowNull: false,
@@ -29,6 +32,7 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Authors');
+    // Note: It's best practice to use the exact table name defined in `up`.
+    await queryInterface.dropTable('authors');
   },
 };
