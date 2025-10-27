@@ -44,7 +44,10 @@ export function buildBookWhere(filter = {}) {
 export function buildAuthorWhere(filter = {}) {
   const where = {};
   if (filter.id != null) where.id = { [Op.eq]: filter.id };
-  if (filter.name != null) where.name = { [Op.eq]: filter.name };
+  if (filter.name != null)
+    where.name = {
+      [Op.iLike]: `%${escapeForLike(filter.name)}%`,
+    };
 
   assertNoConflicts({
     exact: filter.dateOfBirth,
