@@ -1,15 +1,14 @@
-import { AuthorService } from '../../services/author.js';
-
 export const authorResolvers = {
   Query: {
-    authors: (_, args) => AuthorService.list(args),
-    author: (_, { id }) => AuthorService.get(id),
+    authors: (_, args, { services }) => services.author.list(args),
+    author: (_, { id }, { services }) => services.author.get(id),
   },
 
   Mutation: {
-    createAuthor: (_, { input }) => AuthorService.create(input),
-    updateAuthor: (_, { input }) => AuthorService.update(input),
-    deleteAuthor: (_, { input }) => AuthorService.delete(input.id),
+    createAuthor: (_, { input }, { services }) => services.author.create(input),
+    updateAuthor: (_, { input }, { services }) => services.author.update(input),
+    deleteAuthor: (_, { input }, { services }) =>
+      services.author.delete(input.id),
   },
 
   Author: {

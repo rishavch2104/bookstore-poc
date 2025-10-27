@@ -1,10 +1,17 @@
 import { Op } from 'sequelize';
 import { assertNoConflicts, assertValidRange } from './utils.js';
 
+function escapeForLike(value) {
+  return value.replace(/[%_]/g, (ch) => '\\' + ch);
+}
+
 export function buildBookWhere(filter = {}) {
   const where = {};
   if (filter.id != null) where.id = { [Op.eq]: filter.id };
-  if (filter.title != null) where.title = { [Op.eq]: filter.title };
+  if (filter.title != null)
+    where.title = {
+      [Op.iLike]: `%${escapeForLike(filter.title)}%`,
+    };
   if (filter.authorId != null) where.authorId = { [Op.eq]: filter.authorId };
 
   assertNoConflicts({
@@ -62,6 +69,22 @@ export function buildAuthorWhere(filter = {}) {
   } else if (to != null) {
     where.dateOfBirth = { [Op.lte]: to };
   }
+
+  return where;
+}
+
+export function buildUserWhere(filter = {}) {
+  const where = {};
+  if (filter?.id != null) where.id = { [Op.eq]: filter.id };
+  if (filter?.name != null) where.name = { [Op.eq]: filter.name };
+  if (filter?.userName != null) where.userName = { [Op.eq]: filter.userName };
+
+  const from = filter?.createdAtFrom;
+  const to = filter?.createdAtTo;
+  if (from != null && to != null)
+    where.createdAt = { [Op.between]: [from, to] };
+  else if (from != null) where.createdAt = { [Op.gte]: from };
+  else if (to != null) where.createdAt = { [Op.lte]: to };
 
   return where;
 }
