@@ -17,17 +17,6 @@ export function makeReviewService({ Review, Book, User }) {
         hasNextPage: offset + nodes.length < totalCount,
       };
     },
-
-    async getSummary(bookId) {
-      const agg = await Review.aggregate([
-        { $match: { bookId } },
-        { $group: { _id: null, count: { $sum: 1 }, sum: { $sum: '$rating' } } },
-      ]);
-      const { count = 0, sum = 0 } = agg[0] || {};
-      const average = count ? sum / count : 0;
-      return { count, average };
-    },
-
     async create(
       { bookId, userId, rating, title, body },
       { transaction, mongoSession } = {}

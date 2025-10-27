@@ -1,10 +1,17 @@
 import { Op } from 'sequelize';
 import { assertNoConflicts, assertValidRange } from './utils.js';
 
+function escapeForLike(value) {
+  return value.replace(/[%_]/g, (ch) => '\\' + ch);
+}
+
 export function buildBookWhere(filter = {}) {
   const where = {};
   if (filter.id != null) where.id = { [Op.eq]: filter.id };
-  if (filter.title != null) where.title = { [Op.eq]: filter.title };
+  if (filter.title != null)
+    where.title = {
+      [Op.iLike]: `%${escapeForLike(filter.title)}%`,
+    };
   if (filter.authorId != null) where.authorId = { [Op.eq]: filter.authorId };
 
   assertNoConflicts({

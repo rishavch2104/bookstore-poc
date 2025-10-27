@@ -1,4 +1,3 @@
-// services/book.js
 import { GraphQLError } from 'graphql';
 import { buildAuthorWhere, buildBookWhere } from './filters.js';
 
