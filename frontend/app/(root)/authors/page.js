@@ -3,33 +3,8 @@ import { getClient } from '../../../lib/apolloClient.js';
 
 import SearchForm from '../../../components/SearchForm.js';
 import AuthorCard from '../../../components/AuthorCard.js';
-import { gql } from '@apollo/client';
+import { getAuthorPageAction } from '@/lib/actions.js';
 export const dynamic = 'force-dynamic';
-
-export const GET_AUTHORS = gql`
-  query GetAuthorsPageFiltered(
-    $limit: Int!
-    $offset: Int!
-    $filter: AuthorFilter
-    $orderBy: [AuthorOrder!]
-  ) {
-    authors(
-      limit: $limit
-      offset: $offset
-      filter: $filter
-      orderBy: $orderBy
-    ) {
-      totalCount
-      hasNextPage
-      nodes {
-        id
-        name
-        dateOfBirth
-        bio
-      }
-    }
-  }
-`;
 
 export default async function page({ searchParams }) {
   const sp = await searchParams;
@@ -50,11 +25,16 @@ export default async function page({ searchParams }) {
         }
       : null;
 
-  const { data } = await getClient().query({
-    query: GET_AUTHORS,
-    variables: { limit, offset, ...(filter && { filter }) },
-    fetchPolicy: 'no-cache',
+  const res = await getAuthorPageAction({
+    limit,
+    offset,
+    ...(filter && { filter }),
   });
+
+  if (res.status == 'FAILURE') {
+    return <div>NOT FOUND</div>;
+  }
+  const data = res.data;
 
   const { nodes = [], hasNextPage, totalCount } = data?.authors ?? {};
   const qs = new URLSearchParams({

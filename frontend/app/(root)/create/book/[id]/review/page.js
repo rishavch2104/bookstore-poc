@@ -1,44 +1,7 @@
 import Form from 'next/form';
-import { z } from 'zod';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+
 import { Send } from 'lucide-react';
-import { createReview } from '@/lib/actions';
-
-const reviewSchema = z.object({
-  rating: z.string(),
-  title: z.string(),
-  body: z.string(),
-});
-
-export async function createReviewAction(bookId, formData) {
-  'use server';
-  const values = Object.fromEntries(formData.entries());
-
-  const parsed = reviewSchema.safeParse(values);
-
-  if (!parsed.success) {
-    const params = new URLSearchParams();
-    for (const [k, v] of Object.entries(values))
-      if (v) params.set(k, String(v));
-
-    const fieldErrors = parsed.error.flatten().fieldErrors;
-    Object.entries(fieldErrors).forEach(([field, msgs]) => {
-      if (msgs?.[0]) params.set(`${field}Error`, msgs[0]);
-    });
-
-    redirect(`/book/${bookId}`);
-  }
-
-  const result = await createReview(formData, bookId);
-
-  if (result?.status === 'SUCCESS') {
-    revalidatePath(`/book/${bookId}`);
-    redirect(`/book/${bookId}`);
-  }
-
-  redirect(`/book/${bookId}/?error=Something%20went%20wrong`);
-}
+import { createReviewAction } from '@/lib/actions';
 
 export default async function createReviewPage({ params, searchParams }) {
   const sp = await searchParams;

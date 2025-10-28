@@ -1,30 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { gql } from '@apollo/client';
 import { cookies } from 'next/headers';
-import { deleteAuthorAction } from '@/lib/actions.js';
+import { deleteAuthorAction, getAuthorAction } from '@/lib/actions.js';
 import { Trash2 } from 'lucide-react';
 import { Pencil } from 'lucide-react';
-import { getClient } from '../../../../lib/apolloClient.js';
 import { formatDate } from '@/lib/utils';
-
-const GET_AUTHOR = gql`
-  query GetAuthorPage($id: ID!) {
-    author(id: $id) {
-      id
-      name
-      bio
-      dateOfBirth
-      books {
-        id
-        title
-        description
-        publishedDate
-      }
-    }
-  }
-`;
 
 export default async function page({ params }) {
   const sp = await params;
@@ -46,14 +27,7 @@ export default async function page({ params }) {
       </main>
     );
   }
-
-  const { data } = await getClient().query({
-    query: GET_AUTHOR,
-    variables: { id },
-    fetchPolicy: 'no-cache',
-  });
-
-  const author = data?.author;
+  const { author } = await getAuthorAction({ id });
   if (!author) {
     return (
       <main className="section_container">

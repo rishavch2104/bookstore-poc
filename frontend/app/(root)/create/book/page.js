@@ -1,54 +1,11 @@
 import Form from 'next/form';
-import { z } from 'zod';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+
 import { Send } from 'lucide-react';
-import { createBook } from '@/lib/actions';
-
-const bookSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters'),
-  authorId: z.string().min(1, 'Author is required'),
-  publishedDate: z.string().optional(),
-  description: z.string().optional(),
-});
-
-async function getAuthors() {
-  const base = process.env.FRONT_END_URL; // e.g. https://your-domain.com
-  const res = await fetch(new URL('/api/authors', base), { cache: 'no-store' });
-  const data = await res.json();
-  return data?.authors ?? [];
-}
-
-export async function createBookAction(formData) {
-  'use server';
-
-  const values = Object.fromEntries(formData.entries());
-  const parsed = bookSchema.safeParse(values);
-
-  if (!parsed.success) {
-    const params = new URLSearchParams();
-    for (const [k, v] of Object.entries(values))
-      if (v) params.set(k, String(v));
-    const fieldErrors = parsed.error.flatten().fieldErrors;
-    Object.entries(fieldErrors).forEach(([field, msgs]) => {
-      if (msgs?.[0]) params.set(`${field}Error`, msgs[0]);
-    });
-    redirect(`/books/create?${params.toString()}`);
-  }
-
-  const result = await createBook(formData);
-
-  if (result?.status === 'SUCCESS') {
-    revalidatePath('/');
-    redirect('/');
-  }
-
-  redirect(`/books/create?error=Something%20went%20wrong`);
-}
+import { createBookAction, getAllAuthors } from '@/lib/actions';
 
 export default async function CreateBookPage({ searchParams }) {
   const sp = await searchParams;
-  const authors = await getAuthors();
+  const { authors } = await getAllAuthors();
 
   return (
     <section className="max-w-2xl mx-auto mt-12 px-4">

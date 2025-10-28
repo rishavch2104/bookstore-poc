@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 
-export default function Page() {
+export default function page() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,6 @@ export default function Page() {
       });
 
       if (res.ok) {
-        // Use router for SPA nav; fallback to hard redirect if needed
         router.replace('/');
         router.refresh();
       } else {
@@ -50,7 +49,6 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-100 via-white to-indigo-100 dark:from-zinc-900 dark:via-zinc-950 dark:to-violet-950">
-      {/* Hero / reference-style header */}
       <section className="section_container">
         <div className="pink_container rounded-[30px] text-center py-10">
           <span className="tag">Welcome back</span>
@@ -59,11 +57,9 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Form Card */}
       <section className="section_container">
         <div className="mx-auto w-full max-w-md rounded-2xl bg-white/70 dark:bg-zinc-900/60 backdrop-blur border border-zinc-200/70 dark:border-zinc-800 p-6 shadow-lg">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {/* Email */}
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -85,7 +81,6 @@ export default function Page() {
               </div>
             </div>
 
-            {/* Password */}
             <div className="space-y-2">
               <label
                 htmlFor="password"
