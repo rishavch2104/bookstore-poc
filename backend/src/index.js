@@ -1,13 +1,18 @@
-import { createApp } from './app.js';
-import { config } from './config/index.js';
+// backend/src/index.js (The Vercel-ready file)
 
-export default app = await createApp()
-  .then((app) => {
-    app.listen(config.port, () => {
-      console.log('Server ready');
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-    process.exit(1);
-  });
+import { createApp } from './app.js';
+
+// We get the app instance asynchronously
+let app;
+try {
+  app = await createApp();
+} catch (err) {
+  console.error('Failed to create app:', err);
+  // You can handle initial setup failures here
+}
+
+// *** CRITICAL CHANGE: Export the app instance instead of calling app.listen() ***
+export default app;
+
+// Remove the app.listen() and config.port logic entirely.
+// Vercel handles all networking and port listening.
