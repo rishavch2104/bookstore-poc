@@ -25,6 +25,20 @@ export default async function Page({ searchParams }) {
         }
       : null;
 
+  const buildQuery = (newPage) => {
+    const params = new URLSearchParams();
+
+    if (title) params.set('title', title);
+    if (author) params.set('author', author);
+    if (dateFrom) params.set('dateFrom', dateFrom);
+    if (dateTo) params.set('dateTo', dateTo);
+
+    params.set('limit', String(limit));
+    params.set('page', String(newPage));
+
+    // Return just "?..." so it works regardless of the current pathname
+    return `?${params.toString()}`;
+  };
   const res = await getAuthorPageAction({
     limit,
     offset,
@@ -74,10 +88,7 @@ export default async function Page({ searchParams }) {
           {page > 1 && (
             <a
               className="rounded-2xl bg-gray-200 px-4 py-2"
-              href={`/authors?${new URLSearchParams({
-                ...Object.fromEntries(qs),
-                page: String(page - 1),
-              })}`}
+              href={buildQuery(page - 1)}
             >
               Prev
             </a>
@@ -85,10 +96,7 @@ export default async function Page({ searchParams }) {
           {hasNextPage && (
             <a
               className="rounded-2xl bg-black px-4 py-2 text-white"
-              href={`/authors?${new URLSearchParams({
-                ...Object.fromEntries(qs),
-                page: String(page + 1),
-              })}`}
+              href={buildQuery(page + 1)}
             >
               Next
             </a>
