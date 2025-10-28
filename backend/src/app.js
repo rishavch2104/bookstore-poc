@@ -7,6 +7,7 @@ import { resolvers } from './graphql/resolvers/index.js';
 import { formatError } from './graphql/utils/errorFormatter.js';
 import { buildContext } from './graphql/context.js';
 import { initModels } from './db/sequelize/models/index.js';
+import { config } from './config/index.js';
 
 import { ApolloServer } from '@apollo/server';
 
@@ -26,21 +27,24 @@ const authMiddleware = (req, res, next) => {
   next();
 };
 
-export async function createApp() {
-  const app = express();
+const app = express();
 
-  const server = new ApolloServer({ typeDefs, resolvers, formatError });
-  initModels();
+const server = new ApolloServer({ typeDefs, resolvers, formatError });
+initModels();
 
-  await server.start();
-  app.use(
-    '/graphql',
-    authMiddleware,
-    cors(),
-    json(),
-    expressMiddleware(server, { context: ({ req }) => buildContext({ req }) })
-  );
+await server.start();
+app.use(
+  '/graphql',
+  authMiddleware,
+  cors(),
+  json(),
+  expressMiddleware(server, { context: ({ req }) => buildContext({ req }) })
+);
 
-  app.get('/health', (_, res) => res.send('ok'));
-  return app;
-}
+app.get('/health', (_, res) => res.send('ok'));
+
+app.listen(config.port, () => {
+  console.log('Server ready');
+});
+
+export default app;
