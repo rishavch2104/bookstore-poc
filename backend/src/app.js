@@ -26,21 +26,18 @@ const authMiddleware = (req, res, next) => {
   next();
 };
 
-export async function createApp() {
-  const app = express();
+const app = express();
 
-  const server = new ApolloServer({ typeDefs, resolvers, formatError });
-  initModels();
+const server = new ApolloServer({ typeDefs, resolvers, formatError });
+initModels();
 
-  await server.start();
-  app.use(
-    '/graphql',
-    authMiddleware,
-    cors(),
-    json(),
-    expressMiddleware(server, { context: ({ req }) => buildContext({ req }) })
-  );
+await server.start();
+app.use(
+  '/graphql',
+  authMiddleware,
+  cors(),
+  json(),
+  expressMiddleware(server, { context: ({ req }) => buildContext({ req }) })
+);
 
-  app.get('/health', (_, res) => res.send('ok'));
-  return app;
-}
+app.get('/health', (_, res) => res.send('ok'));
