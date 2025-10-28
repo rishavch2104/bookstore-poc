@@ -27,7 +27,7 @@ export default function SearchForm({
     <Form
       action={action}
       scroll={false}
-      className="search-form grid w-full gap-3 md:grid-cols-[1fr,1fr,auto] md:items-end"
+      className="search-form grid w-full gap-3 md:grid-cols-[1fr,1fr,auto] md:items-end justify-center"
     >
       {variant === 'books' ? (
         <>
