@@ -28,10 +28,9 @@ export default async function Page({ searchParams }) {
   const buildQuery = (newPage) => {
     const params = new URLSearchParams();
 
-    if (title) params.set('title', title);
-    if (author) params.set('author', author);
-    if (dateFrom) params.set('dateFrom', dateFrom);
-    if (dateTo) params.set('dateTo', dateTo);
+    if (name) params.set('name', title);
+    if (dobFrom) params.set('dobFrom', author);
+    if (dobTo) params.set('dobTo', dateFrom);
 
     params.set('limit', String(limit));
     params.set('page', String(newPage));
