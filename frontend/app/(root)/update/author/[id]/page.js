@@ -2,7 +2,7 @@ import Form from 'next/form';
 import { Send } from 'lucide-react';
 import { updateAuthorAction } from '@/lib/actions';
 
-export default async function UpdateAuthorPage({ params, searchParams }) {
+export default async function page({ params, searchParams }) {
   const id = (await params).id;
   const sp = await searchParams;
 

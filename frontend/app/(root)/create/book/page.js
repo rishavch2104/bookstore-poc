@@ -3,7 +3,7 @@ import Form from 'next/form';
 import { Send } from 'lucide-react';
 import { createBookAction, getAllAuthors } from '@/lib/actions';
 
-export default async function CreateBookPage({ searchParams }) {
+export default async function page({ searchParams }) {
   const sp = await searchParams;
   const { authors } = await getAllAuthors();
 
