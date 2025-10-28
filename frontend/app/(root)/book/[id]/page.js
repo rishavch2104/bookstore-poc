@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 import { Trash2 } from 'lucide-react';
 import { deleteBookAction, getBookAction } from '@/lib/actions.js';
 
-export default async function page({ params }) {
+export default async function Page({ params }) {
   const cookieObj = await cookies();
   const role = cookieObj.get('role')?.value;
   const isLoggedIn = cookieObj.get('token')?.value;

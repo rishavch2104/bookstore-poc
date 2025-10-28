@@ -7,7 +7,7 @@ import { Trash2 } from 'lucide-react';
 import { Pencil } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
-export default async function page({ params }) {
+export default async function Page({ params }) {
   const sp = await params;
   const role = (await cookies()).get('role')?.value;
   const id = sp?.id;

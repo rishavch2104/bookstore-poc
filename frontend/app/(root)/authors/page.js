@@ -6,7 +6,7 @@ import AuthorCard from '../../../components/AuthorCard.js';
 import { getAuthorPageAction } from '@/lib/actions.js';
 export const dynamic = 'force-dynamic';
 
-export default async function page({ searchParams }) {
+export default async function Page({ searchParams }) {
   const sp = await searchParams;
   const name = (sp?.name ?? '').trim();
   const dobFrom = sp?.dobFrom ?? '';

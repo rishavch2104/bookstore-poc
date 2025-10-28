@@ -3,7 +3,7 @@ import Form from 'next/form';
 import { Send } from 'lucide-react';
 import { createReviewAction } from '@/lib/actions';
 
-export default async function page({ params, searchParams }) {
+export default async function Page({ params, searchParams }) {
   const sp = await searchParams;
   const pm = await params;
   const revAction = createReviewAction.bind(null, pm.id);
