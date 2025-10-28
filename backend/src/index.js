@@ -1,7 +1,7 @@
 import { createApp } from './app.js';
 import { config } from './config/index.js';
 
-createApp()
+export default app = await createApp()
   .then((app) => {
     app.listen(config.port, () => {
       console.log('Server ready');
