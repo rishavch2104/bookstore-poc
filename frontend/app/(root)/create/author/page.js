@@ -2,7 +2,7 @@ import Form from 'next/form';
 import { Send } from 'lucide-react';
 import { createAuthorAction } from '@/lib/actions';
 
-export default async function page({ searchParams }) {
+export default async function Page({ searchParams }) {
   const sp = await searchParams;
 
   return (
