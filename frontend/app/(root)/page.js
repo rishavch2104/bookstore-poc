@@ -1,33 +1,9 @@
 import SearchForm from '../../components/SearchForm';
 import BookCard from '../../components/BookCard';
-import { gql } from '@apollo/client';
-import { getClient } from '../../lib/apolloClient.js';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
-
-const GET_BOOKS = gql`
-  query GetBooksPageFiltered(
-    $limit: Int!
-    $offset: Int!
-    $filter: BookFilter
-    $orderBy: [BookOrder!]
-  ) {
-    books(limit: $limit, offset: $offset, filter: $filter, orderBy: $orderBy) {
-      totalCount
-      hasNextPage
-      nodes {
-        id
-        title
-        publishedDate
-        author {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
+import { getBookPageAction } from '@/lib/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,11 +28,16 @@ export default async function Home({ searchParams }) {
         }
       : null;
 
-  const { data } = await getClient().query({
-    query: GET_BOOKS,
-    variables: { limit, offset, ...(filter != null && { filter }) },
-    fetchPolicy: 'no-cache',
+  const res = await getBookPageAction({
+    limit,
+    offset,
+    ...(filter && { filter }),
   });
+
+  if (res.status == 'FAILURE') {
+    return <div>NOT FOUND</div>;
+  }
+  const data = res.data;
 
   const { nodes = [], hasNextPage, totalCount } = data?.books ?? {};
 

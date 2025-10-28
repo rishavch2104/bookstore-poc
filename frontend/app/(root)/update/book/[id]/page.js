@@ -1,74 +1,15 @@
 import Form from 'next/form';
-import { z } from 'zod';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+
 import { Send } from 'lucide-react';
-import { updateBookAction as updateBookInLib } from '@/lib/actions';
+import { updateBookAction, getAllAuthors } from '@/lib/actions';
 
-const schema = z.object({
-  title: z.string().min(3, 'Name must be at least 3 characters'),
-  authorId: z.string(),
-  publishedDate: z.string(),
-  description: z.string(),
-});
-
-async function getAuthors() {
-  const base = process.env.FRONT_END_URL;
-  const res = await fetch(new URL('/api/authors', base), { cache: 'no-store' });
-  const data = await res.json();
-  return data?.authors ?? [];
-}
-
-async function updateBookServerAction(id, formData) {
-  'use server';
-  const values = Object.fromEntries(formData.entries());
-  const parsed = schema.safeParse(values);
-
-  if (!parsed.success) {
-    const params = new URLSearchParams();
-    console
-      .log('errr')
-      [('title', 'authorId', 'publishedDate', 'description')].forEach((k) => {
-        const v = values[k];
-        if (v) params.set(k, String(v));
-      });
-
-    const errs = parsed.error.flatten().fieldErrors;
-    Object.entries(errs).forEach(([field, msgs]) => {
-      if (msgs?.[0]) params.set(`${field}Error`, msgs[0]);
-    });
-    redirect(`/books/${id}/edit?${params.toString()}`);
-  }
-
-  const fd = new FormData();
-  fd.set('id', id);
-  fd.set('title', values.title || '');
-  fd.set('authorId', values.authorId || '');
-  fd.set('publishedDate', values.publishedDate || '');
-  fd.set('description', values.description || '');
-  const result = await updateBookInLib(fd);
-
-  if (result?.status === 'SUCCESS') {
-    // Revalidate list/detail pages as needed
-    revalidatePath('/');
-    revalidatePath(`/book/${id}`);
-    redirect(`/book/${id}`);
-  }
-
-  redirect(
-    `/books/${id}/edit?error=Something%20went%20wrong&returnTo=${encodeURIComponent(
-      returnTo
-    )}`
-  );
-}
-
-export default async function UpdateBookPage({ params, searchParams }) {
+export default async function page({ params, searchParams }) {
   const id = (await params).id;
   const sp = await searchParams;
 
-  const authors = await getAuthors();
+  const { authors } = await getAllAuthors();
 
-  const action = updateBookServerAction.bind(null, id);
+  const action = updateBookAction.bind(null, id);
   const {
     title = '',
     authorId = '',

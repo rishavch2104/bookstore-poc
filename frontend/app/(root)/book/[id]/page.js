@@ -7,38 +7,7 @@ import Image from 'next/image';
 import { Pencil, Star } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { Trash2 } from 'lucide-react';
-import { deleteBookAction } from '@/lib/actions.js';
-
-const GET_BOOK = gql`
-  query GetBookWithReviewsPage($id: ID!, $limit: Int!, $offset: Int!) {
-    book(id: $id) {
-      id
-      title
-      publishedDate
-      description
-      author {
-        id
-        name
-      }
-      ratingSummary {
-        count
-        average
-      }
-      reviews(limit: $limit, offset: $offset) {
-        totalCount
-        hasNextPage
-        nodes {
-          id
-          userId
-          rating
-          title
-          body
-          createdAt
-        }
-      }
-    }
-  }
-`;
+import { deleteBookAction, getBookAction } from '@/lib/actions.js';
 
 export default async function page({ params }) {
   const cookieObj = await cookies();
@@ -67,13 +36,8 @@ export default async function page({ params }) {
     );
   }
 
-  const { data } = await getClient().query({
-    query: GET_BOOK,
-    variables: { id, limit, offset },
-    fetchPolicy: 'no-cache',
-  });
+  const { book } = await getBookAction({ id, limit, offset });
 
-  const book = data?.book;
   if (!book) {
     return (
       <main className="section_container">

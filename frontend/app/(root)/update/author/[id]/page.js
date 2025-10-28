@@ -1,67 +1,12 @@
 import Form from 'next/form';
-import { z } from 'zod';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
 import { Send } from 'lucide-react';
-import { updateAuthorAction as updateAuthorInLib } from '@/lib/actions';
+import { updateAuthorAction } from '@/lib/actions';
 
-const schema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters'),
-  bio: z.string().min(10, 'Bio must be at least 10 characters').optional(),
-  dateOfBirth: z.string().optional(),
-  returnTo: z.string().optional(),
-});
-
-async function updateAuthorServerAction(id, formData) {
-  'use server';
-
-  const values = Object.fromEntries(formData.entries());
-  const parsed = schema.safeParse(values);
-
-  if (!parsed.success) {
-    const params = new URLSearchParams();
-
-    ['name', 'bio', 'dateOfBirth', 'returnTo'].forEach((k) => {
-      const v = values[k];
-      if (v) params.set(k, String(v));
-    });
-
-    const errs = parsed.error.flatten().fieldErrors;
-    Object.entries(errs).forEach(([field, msgs]) => {
-      if (msgs?.[0]) params.set(`${field}Error`, msgs[0]);
-    });
-
-    redirect(`/author/${id}/edit?${params.toString()}`);
-  }
-
-  const { name = '', bio = '', dateOfBirth = '', returnTo } = parsed.data;
-
-  const fd = new FormData();
-  fd.set('id', id);
-  fd.set('name', name);
-  fd.set('bio', bio);
-  fd.set('dateOfBirth', dateOfBirth);
-
-  const result = await updateAuthorInLib(fd);
-
-  if (result?.status === 'SUCCESS') {
-    revalidatePath('/author');
-    revalidatePath(`/author/${id}`);
-    redirect(returnTo ?? `/author/${id}`);
-  }
-
-  redirect(
-    `/author/${id}/edit?error=${encodeURIComponent('Something went wrong')}${
-      returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ''
-    }`
-  );
-}
-
-export default async function UpdateAuthorPage({ params, searchParams }) {
+export default async function page({ params, searchParams }) {
   const id = (await params).id;
   const sp = await searchParams;
 
-  const action = updateAuthorServerAction.bind(null, id);
+  const action = updateAuthorAction.bind(null, id);
 
   const {
     name = '',

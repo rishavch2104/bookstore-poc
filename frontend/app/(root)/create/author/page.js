@@ -1,44 +1,6 @@
 import Form from 'next/form';
-import { z } from 'zod';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
 import { Send } from 'lucide-react';
-import { createAuthor } from '@/lib/actions';
-
-const authorSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters'),
-  bio: z.string().min(10, 'Bio must be at least 10 characters').optional(),
-  dateOfBirth: z.string().optional(),
-});
-
-export async function createAuthorAction(formData) {
-  'use server';
-
-  const values = Object.fromEntries(formData.entries());
-  const parsed = authorSchema.safeParse(values);
-
-  if (!parsed.success) {
-    const params = new URLSearchParams();
-    for (const [k, v] of Object.entries(values))
-      if (v) params.set(k, String(v));
-
-    const fieldErrors = parsed.error.flatten().fieldErrors;
-    Object.entries(fieldErrors).forEach(([field, msgs]) => {
-      if (msgs?.[0]) params.set(`${field}Error`, msgs[0]);
-    });
-
-    redirect(`/authors/create?${params.toString()}`);
-  }
-
-  const result = await createAuthor(formData);
-
-  if (result?.status === 'SUCCESS') {
-    revalidatePath('/authors');
-    redirect('/authors');
-  }
-
-  redirect(`/authors/create?error=Something%20went%20wrong`);
-}
+import { createAuthorAction } from '@/lib/actions';
 
 export default async function page({ searchParams }) {
   const sp = await searchParams;
