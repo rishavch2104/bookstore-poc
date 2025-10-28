@@ -1,7 +1,10 @@
 import SearchForm from '../../components/SearchForm';
 import BookCard from '../../components/BookCard';
 import { gql } from '@apollo/client';
-import { getClient } from '../lib/apolloClient.js';
+import { getClient } from '../../lib/apolloClient.js';
+import { cookies } from 'next/headers';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 
 const GET_BOOKS = gql`
   query GetBooksPageFiltered(
@@ -26,6 +29,8 @@ const GET_BOOKS = gql`
   }
 `;
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home({ searchParams }) {
   const sp = await searchParams;
   const title = sp?.title ?? '';
@@ -36,10 +41,11 @@ export default async function Home({ searchParams }) {
   const page = Math.max(1, Number(sp?.page ?? 1));
   const limit = Number(sp?.limit ?? 9);
   const offset = (page - 1) * limit;
+
   const filter =
     title || author || dateFrom || dateTo
       ? {
-          ...(title && { title: title }),
+          ...(title && { title }),
           ...(author && { author: { name: author } }),
           ...(dateFrom && { publishedDateFrom: dateFrom }),
           ...(dateTo && { publishedDateTo: dateTo }),
@@ -51,20 +57,25 @@ export default async function Home({ searchParams }) {
     variables: { limit, offset, ...(filter != null && { filter }) },
     fetchPolicy: 'no-cache',
   });
+
   const { nodes = [], hasNextPage, totalCount } = data?.books ?? {};
+
+  const role = (await cookies()).get('role')?.value;
+
+  const isAdmin = role === 'admin';
+
   return (
     <>
       <section className="pink_container">
-        <h1 className="heading"> Find your favourite books</h1>
-        <p className="sub-heading !max-w-3xl"> One stop site</p>
+        <h1 className="heading">Find your favourite books</h1>
+        <p className="sub-heading !max-w-3xl">One stop site</p>
 
         <SearchForm
-          title={title}
-          author={author}
-          dateFrom={dateFrom}
-          dateTo={dateTo}
+          variant="books"
+          values={{ title, author, dateFrom, dateTo }}
         />
       </section>
+
       <section className="section_container">
         <p className="text-30-semibold">
           {title ? `Search results for ${title}` : ''}
@@ -72,11 +83,14 @@ export default async function Home({ searchParams }) {
 
         <ul className="mt-7 card_grid">
           {nodes?.length > 0 ? (
-            nodes.map((book, index) => <BookCard key={book?.id} book={book} />)
+            nodes.map((book) => (
+              <BookCard key={book?.id} book={book} isAdmin={isAdmin} />
+            ))
           ) : (
             <p className="no-results">No results</p>
           )}
         </ul>
+
         <div className="mt-8 flex items-center gap-3">
           {page > 1 && (
             <a
@@ -101,6 +115,16 @@ export default async function Home({ searchParams }) {
           <span className="opacity-70">Total: {totalCount ?? 0}</span>
         </div>
       </section>
+
+      {isAdmin && (
+        <Link
+          href="/create/book"
+          className="fixed bottom-8 right-8 bg-black text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-gray-800 transition"
+          aria-label="Add Book"
+        >
+          <Plus size={28} />
+        </Link>
+      )}
     </>
   );
 }

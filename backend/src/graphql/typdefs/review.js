@@ -26,7 +26,6 @@ export const reviewTypeDefs = gql`
 
   input CreateReviewInput {
     bookId: Int!
-    userId: Int!
     rating: Int!
     title: String
     body: String

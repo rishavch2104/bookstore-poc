@@ -2,7 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { gql } from '@apollo/client';
-import { getClient } from '../../../lib/apolloClient.js';
+import { cookies } from 'next/headers';
+import { deleteAuthorAction } from '@/lib/actions.js';
+import { Trash2 } from 'lucide-react';
+import { Pencil } from 'lucide-react';
+import { getClient } from '../../../../lib/apolloClient.js';
 import { formatDate } from '@/lib/utils';
 
 const GET_AUTHOR = gql`
@@ -22,9 +26,11 @@ const GET_AUTHOR = gql`
   }
 `;
 
-export default async function Page({ params }) {
+export default async function page({ params }) {
   const sp = await params;
+  const role = (await cookies()).get('role')?.value;
   const id = sp?.id;
+  const isAdmin = role === 'admin';
 
   if (!id) {
     return (
@@ -67,11 +73,9 @@ export default async function Page({ params }) {
 
   return (
     <>
-      {/* Header (Author name + book count) */}
       <section className="pink_container !min-h-[230px] flex flex-col items-center justify-center text-center">
         <h1 className="heading">{author.name}</h1>
 
-        {/* White Info Box */}
         <div className="mt-6 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white px-6 py-3 rounded-xl shadow-md inline-block">
           <p className="text-lg font-semibold">
             {totalBooks} {totalBooks === 1 ? 'Book Written' : 'Books Written'}
@@ -79,9 +83,7 @@ export default async function Page({ params }) {
         </div>
       </section>
 
-      {/* Profile Section */}
       <section className="section_container flex flex-col md:flex-row gap-10 items-start">
-        {/* Left - Avatar */}
         <div className="md:w-1/3 w-full">
           <Image
             src={
@@ -95,8 +97,6 @@ export default async function Page({ params }) {
             priority
           />
         </div>
-
-        {/* Right - Bio */}
         <div className="md:w-2/3 w-full space-y-5">
           <h3 className="text-30-bold">About</h3>
           {author.bio ? (
@@ -109,10 +109,8 @@ export default async function Page({ params }) {
         </div>
       </section>
 
-      {/* Divider */}
       <hr className="my-12 border-gray-200 dark:border-gray-800" />
 
-      {/* Books Grid (compact cards) */}
       <section className="section_container">
         <h3 className="text-30-bold mb-6">Books by {author.name}</h3>
 
@@ -127,12 +125,8 @@ export default async function Page({ params }) {
                 key={b.id}
                 className="rounded-lg border bg-white/50 dark:bg-zinc-900/40 overflow-hidden hover:shadow-md transition-shadow"
               >
-                <Link
-                  href={`/books/${b.id}`}
-                  className="block hover:opacity-95"
-                >
+                <Link href={`/book/${b.id}`} className="block hover:opacity-95">
                   <div className="aspect-[3/4] w-full overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={
                         b.coverUrl ||
@@ -158,6 +152,40 @@ export default async function Page({ params }) {
           </ul>
         )}
       </section>
+
+      {isAdmin && (
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
+          {author.books?.length == 0 ? (
+            <form action={deleteAuthorAction}>
+              <input type="hidden" name="authorId" value={id} />
+              <button
+                type="submit"
+                className="bg-red-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-gray-800 transition"
+                title="Delete Book"
+              >
+                <Trash2 className="size-5" />
+              </button>
+            </form>
+          ) : (
+            ''
+          )}
+
+          <Link
+            href={{
+              pathname: `/update/author/${author.id}`,
+              query: {
+                name: author.name,
+                bio: author.bio,
+                dateOfBirth: author.dateOfBirth,
+              },
+            }}
+            aria-label="Edit Book"
+            className="bg-black text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-gray-800 transition"
+          >
+            <Pencil className="w-5 h-5" />
+          </Link>
+        </div>
+      )}
     </>
   );
 }

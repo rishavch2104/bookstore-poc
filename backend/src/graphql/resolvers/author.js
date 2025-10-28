@@ -5,10 +5,12 @@ export const authorResolvers = {
   },
 
   Mutation: {
-    createAuthor: (_, { input }, { services }) => services.author.create(input),
-    updateAuthor: (_, { input }, { services }) => services.author.update(input),
-    deleteAuthor: (_, { input }, { services }) =>
-      services.author.delete(input.id),
+    createAuthor: (_, { input }, { services, user }) =>
+      services.author.create(input, { user }),
+    updateAuthor: (_, { input }, { services, user }) =>
+      services.author.update(input, { user }),
+    deleteAuthor: (_, { input }, { services, user }) =>
+      services.author.delete(input.id, { user }),
   },
 
   Author: {

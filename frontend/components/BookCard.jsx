@@ -1,17 +1,35 @@
 import { formatDate } from '@/lib/utils';
-import { EyeIcon } from 'lucide-react';
+import { EyeIcon, Trash2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Button } from './ui/Button';
-const BookCard = ({ book }) => {
+import { deleteBookAction } from '@/lib/actions';
+
+const BookCard = ({ book, isAdmin }) => {
   const { id, title, description, publishedDate, author, views = 0 } = book;
+
   return (
     <li className="book-card group" key={id}>
       <div className="flex-between">
         <p className="book_card_date">{formatDate(publishedDate)}</p>
-        <div className="flex gap-1.5">
-          <EyeIcon className="size-6 text-primary" />
+
+        <div className="flex gap-1.5 items-center">
+          <EyeIcon className="size-5 text-primary" />
           <span className="text-16-medium">{views}</span>
+
+          {isAdmin && (
+            <div className="flex items-center gap-2 ml-3">
+              <form action={deleteBookAction}>
+                <input type="hidden" name="bookId" value={id} />
+                <button
+                  type="submit"
+                  className="text-red-600 hover:text-red-700 transition"
+                  title="Delete Book"
+                >
+                  <Trash2 className="size-5" />
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
 
@@ -34,20 +52,25 @@ const BookCard = ({ book }) => {
           />
         </Link>
       </div>
+
       <Link href={`/book/${id}`}>
         <p className="book-card_desc">{description}</p>
         <Image
-          src="https://placehold.co/48x48"
+          src="https://placehold.co/300x200"
           alt="placeholder"
-          width={48}
-          height={48}
+          width={300}
+          height={200}
           className="book-card_img"
         />
       </Link>
+
       <div className="flex-between gap-3 mt-5">
-        <Button className="book-card_btn" asChild>
-          <Link href={`/book/${id}`}>Details</Link>
-        </Button>
+        <Link
+          href={`/book/${id}`}
+          className="book-card_btn bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition"
+        >
+          Details
+        </Link>
       </div>
     </li>
   );

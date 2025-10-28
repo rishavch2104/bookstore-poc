@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { buildBookWhere, buildAuthorWhere } from './filters.js';
+import { isAdmin } from './utils.js';
 
 function buildAuthorOrder(orderBy = []) {
   if (!orderBy?.length) return [['id', 'ASC']];
@@ -54,11 +55,14 @@ export function makeAuthorService({ Author, Book, sequelize }) {
       return Author.findByPk(id);
     },
 
-    async create(data, { transaction } = {}) {
+    async create(data, { user, transaction } = {}) {
+      isAdmin(user);
       return Author.create(data, { transaction });
     },
 
-    async update(data, { transaction } = {}) {
+    async update(data, { user, transaction } = {}) {
+      isAdmin(user);
+
       const author = await Author.findByPk(data.id, { transaction });
       if (!author) {
         throw new GraphQLError('Author not found', {
@@ -70,7 +74,9 @@ export function makeAuthorService({ Author, Book, sequelize }) {
       return author;
     },
 
-    async delete(id) {
+    async delete(id, { user } = {}) {
+      isAdmin(user);
+
       return sequelize.transaction(async (t) => {
         const author = await Author.findByPk(id, { transaction: t });
         if (!author) {
@@ -78,10 +84,12 @@ export function makeAuthorService({ Author, Book, sequelize }) {
             extensions: { code: 'NOT_FOUND' },
           });
         }
+
         const count = await Book.count({
           where: { authorId: id },
           transaction: t,
         });
+
         if (count > 0) {
           throw new GraphQLError(
             'Cannot delete author who still has active books',
@@ -90,6 +98,7 @@ export function makeAuthorService({ Author, Book, sequelize }) {
             }
           );
         }
+
         await author.destroy({ transaction: t });
         return true;
       });

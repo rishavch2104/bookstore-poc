@@ -5,4 +5,9 @@ export const commonTypeDefs = gql`
     ASC
     DESC
   }
+  enum UserRole {
+    admin
+    user
+    moderator
+  }
 `;

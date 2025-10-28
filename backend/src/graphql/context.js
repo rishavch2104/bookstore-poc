@@ -7,11 +7,15 @@ import { makeAuthorService } from '../services/author.js';
 import { makeReviewService } from '../services/review.js';
 import { makeBookService } from '../services/book.js';
 import { makeUserService } from '../services/user.js';
+import { makeAuthService } from '../services/auth.js';
 
-export function buildContext() {
+export function buildContext({ req }) {
+  const user = req.user;
+
   const models = { Author, Book, User, Review, sequelize, mongo };
 
   return {
+    user,
     db: models,
     loaders: buildLoaders(models),
     services: {
@@ -19,6 +23,7 @@ export function buildContext() {
       review: makeReviewService(models),
       book: makeBookService(models),
       user: makeUserService(models),
+      auth: makeAuthService(models),
     },
   };
 }

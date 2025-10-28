@@ -5,13 +5,19 @@ export const bookResolvers = {
   },
 
   Mutation: {
-    createBook: (_, { input }, { services }) => services.book.create(input),
-    updateBook: (_, { input }, { services }) => services.book.update(input),
-    deleteBook: (_, { input }, { services }) => services.book.delete(input.id),
+    createBook: (_, { input }, { services, user }) =>
+      services.book.create(input, { user }),
+
+    updateBook: (_, { input }, { services, user }) =>
+      services.book.update(input, { user }),
+
+    deleteBook: (_, { input }, { services, user }) =>
+      services.book.delete(input.id, { user }),
   },
 
   Book: {
     author: (book, _, { loaders }) => loaders.authorById.load(book.authorId),
+
     ratingSummary: (book, _, { loaders }) =>
       loaders.ratingSummaryByBookId.load(book.id),
 

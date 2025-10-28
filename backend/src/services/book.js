@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { buildAuthorWhere, buildBookWhere } from './filters.js';
+import { isAdmin } from './utils.js';
 
 function buildBookOrder(orderBy = []) {
   if (!orderBy?.length) return [['id', 'ASC']];
@@ -64,29 +65,37 @@ export function makeBookService({ Book, Author, sequelize }) {
       return Book.findByPk(id);
     },
 
-    async create(data, { transaction } = {}) {
+    async create(data, { user, transaction } = {}) {
+      isAdmin(user);
+
       const author = await Author.findByPk(data.authorId, { transaction });
       if (!author) {
         throw new GraphQLError('Author not found', {
           extensions: { code: 'NOT_FOUND' },
         });
       }
+
       return Book.create(data, { transaction });
     },
 
-    async update(data, { transaction } = {}) {
+    async update(data, { user, transaction } = {}) {
+      isAdmin(user);
+
       const book = await Book.findByPk(data.id, { transaction });
       if (!book) {
         throw new GraphQLError('Book not found', {
           extensions: { code: 'NOT_FOUND' },
         });
       }
+
       Object.assign(book, data);
       await book.save({ transaction });
       return book;
     },
 
-    async delete(id) {
+    async delete(id, { user } = {}) {
+      isAdmin(user);
+
       return sequelize.transaction(async (t) => {
         const book = await Book.findByPk(id, { transaction: t });
         if (!book) {
