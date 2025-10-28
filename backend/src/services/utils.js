@@ -32,3 +32,24 @@ export function assertValidRange({ from, to, field }) {
     }
   }
 }
+
+export function isAdmin(user) {
+  if (!user) {
+    throw new GraphQLError('Authentication required', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
+
+  if (user.role !== 'admin') {
+    throw new GraphQLError('Only admins can perform this action', {
+      extensions: { code: 'FORBIDDEN' },
+    });
+  }
+}
+export function isLoggedIn(user) {
+  if (!user) {
+    throw new GraphQLError('Authentication required', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
+}

@@ -11,14 +11,6 @@ User.init(
       primaryKey: true,
       allowNull: false,
     },
-    userName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        len: [3, 50],
-      },
-    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,

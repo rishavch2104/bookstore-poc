@@ -5,10 +5,12 @@ export const reviewResolvers = {
   },
 
   Mutation: {
-    createReview: (_, { input }, { services }) => services.review.create(input),
-    updateReview: (_, { input }, { services }) => services.review.update(input),
-    deleteReview: (_, { input }, { services }) =>
-      services.review.delete(input.id),
+    createReview: (_, { input }, { services, user }) =>
+      services.review.create(input, { user }),
+    updateReview: (_, { input }, { services, user }) =>
+      services.review.update(input, { user }),
+    deleteReview: (_, { input }, { services, user }) =>
+      services.review.delete(input.id, { user }),
   },
 
   Review: {

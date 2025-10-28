@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { isLoggedIn } from './utils.js';
 
 export function makeReviewService({ Review, Book, User }) {
   return {
@@ -18,20 +19,14 @@ export function makeReviewService({ Review, Book, User }) {
       };
     },
     async create(
-      { bookId, userId, rating, title, body },
-      { transaction, mongoSession } = {}
+      { bookId, rating, title, body },
+      { user, transaction, mongoSession } = {}
     ) {
-      const [book, user] = await Promise.all([
-        Book.findByPk(bookId, { transaction }),
-        User.findByPk(userId, { transaction }),
-      ]);
+      isLoggedIn(user);
+
+      const book = await Book.findByPk(bookId, { transaction });
       if (!book) {
         throw new GraphQLError('Book not found', {
-          extensions: { code: 'NOT_FOUND' },
-        });
-      }
-      if (!user) {
-        throw new GraphQLError('User not found', {
           extensions: { code: 'NOT_FOUND' },
         });
       }
@@ -44,7 +39,7 @@ export function makeReviewService({ Review, Book, User }) {
 
       try {
         const doc = await Review.create(
-          [{ bookId, userId, rating, title, body }],
+          [{ bookId, userId: user.id, rating, title, body }],
           { session: mongoSession }
         );
 
@@ -59,7 +54,8 @@ export function makeReviewService({ Review, Book, User }) {
       }
     },
 
-    async update({ id, rating, title, body }, { mongoSession } = {}) {
+    async update({ id, rating, title, body }, { user, mongoSession } = {}) {
+      isLoggedIn(user);
       const patch = {};
       if (rating != null) {
         if (rating < 1 || rating > 5) {
@@ -86,7 +82,8 @@ export function makeReviewService({ Review, Book, User }) {
       return updated;
     },
 
-    async delete(id, { mongoSession } = {}) {
+    async delete(id, { user, mongoSession } = {}) {
+      isLoggedIn(user);
       const res = await Review.findByIdAndDelete(id, { session: mongoSession });
       if (!res) {
         throw new GraphQLError('Review not found', {

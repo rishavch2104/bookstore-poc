@@ -8,6 +8,8 @@ import { authorTypeDefs } from './author.js';
 import { bookTypeDefs } from './book.js';
 import { reviewTypeDefs } from './review.js';
 
+import { authTypeDefs } from './auth.js';
+
 import gql from 'graphql-tag';
 const rootTypeDefs = gql`
   type Query
@@ -22,4 +24,5 @@ export const typeDefs = mergeTypeDefs([
   authorTypeDefs,
   bookTypeDefs,
   reviewTypeDefs,
+  authTypeDefs,
 ]);

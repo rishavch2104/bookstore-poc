@@ -4,6 +4,7 @@ import { wrapQueryResolversWithNotFound } from '../utils/wrapQueries.js';
 import { DateScalar } from './dateScalar.js';
 import { reviewResolvers } from './review.js';
 import { userResolvers } from './user.js';
+import { authResolvers } from './auth.js';
 
 const base = {
   Date: DateScalar,
@@ -18,6 +19,7 @@ const base = {
     ...bookResolvers.Mutation,
     ...reviewResolvers.Mutation,
     ...userResolvers.Mutation,
+    ...authResolvers.Mutation,
   },
   Author: authorResolvers.Author,
   Book: bookResolvers.Book,

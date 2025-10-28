@@ -1,8 +1,13 @@
 import Navbar from '../../components/Navbar';
-export default function Layout({ children }) {
+import { cookies } from 'next/headers';
+
+export default async function Layout({ children }) {
+  const token = (await cookies()).get('token')?.value;
+  const isLoggedIn = Boolean(token);
+
   return (
     <main className="font-work-sans">
-      <Navbar />
+      <Navbar isLoggedIn={isLoggedIn} />
       {children}
     </main>
   );

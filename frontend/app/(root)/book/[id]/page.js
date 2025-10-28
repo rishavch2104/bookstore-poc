@@ -1,11 +1,13 @@
-// File: app/books/[id]/page.jsx
 import React from 'react';
 import Link from 'next/link';
 import { gql } from '@apollo/client';
-import { getClient } from '../../../lib/apolloClient.js';
+import { getClient } from '../../../../lib/apolloClient.js';
 import { formatDate } from '@/lib/utils';
 import Image from 'next/image';
-import { Star } from 'lucide-react';
+import { Pencil, Star } from 'lucide-react';
+import { cookies } from 'next/headers';
+import { Trash2 } from 'lucide-react';
+import { deleteBookAction } from '@/lib/actions.js';
 
 const GET_BOOK = gql`
   query GetBookWithReviewsPage($id: ID!, $limit: Int!, $offset: Int!) {
@@ -38,7 +40,11 @@ const GET_BOOK = gql`
   }
 `;
 
-export default async function Page({ params }) {
+export default async function page({ params }) {
+  const cookieObj = await cookies();
+  const role = cookieObj.get('role')?.value;
+  const isLoggedIn = cookieObj.get('token')?.value;
+  const isAdmin = role === 'admin';
   const sp = await params;
 
   const id = sp?.id;
@@ -100,7 +106,6 @@ export default async function Page({ params }) {
 
   return (
     <>
-      {/* Header Section with Rating */}
       <section className="pink_container !min-h-[230px]">
         <p className="tag">{formatDate(book.publishedDate)}</p>
         <h1 className="heading">{book.title}</h1>
@@ -121,9 +126,7 @@ export default async function Page({ params }) {
         )}
       </section>
 
-      {/* Book Image + Author Info */}
       <section className="section_container flex flex-col md:flex-row gap-10 items-start">
-        {/* Left side - Image */}
         <div className="md:w-1/2 w-full">
           <img
             src="https://images.unsplash.com/photo-1512820790803-83ca734da794"
@@ -132,7 +135,6 @@ export default async function Page({ params }) {
           />
         </div>
 
-        {/* Right side - Content */}
         <div className="md:w-1/2 w-full space-y-5">
           <div className="flex-between gap-5">
             <Link
@@ -157,10 +159,8 @@ export default async function Page({ params }) {
         </div>
       </section>
 
-      {/* Divider */}
       <hr className="my-12 border-gray-200 dark:border-gray-800" />
 
-      {/* Reviews Section */}
       <section className="section_container space-y-6">
         <div className="flex items-end justify-between flex-wrap gap-3">
           <h3 className="text-30-bold">Reviews</h3>
@@ -168,6 +168,11 @@ export default async function Page({ params }) {
             <p className="text-sm text-gray-500">
               Showing {showingStart}–{showingEnd} of {total}
             </p>
+          )}
+          {isLoggedIn && !isAdmin && (
+            <div>
+              <Link href={`/create/book/${id}/review`}> Add a Review</Link>
+            </div>
           )}
         </div>
 
@@ -187,9 +192,7 @@ export default async function Page({ params }) {
                     <span className="inline-flex items-center rounded-md bg-amber-100 text-amber-800 px-2 py-0.5 text-xs font-medium">
                       {r.rating.toFixed(1)} / 5.0
                     </span>
-                    <p className="text-16-medium">
-                      {r.title || 'Untitled review'}
-                    </p>
+                    <p className="text-16-medium">{r.title || ''}</p>
                   </div>
                   <span className="text-xs text-gray-500">
                     {formatDate(r.createdAt)}
@@ -205,7 +208,6 @@ export default async function Page({ params }) {
           </ul>
         )}
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <nav className="mt-6 flex items-center justify-between gap-3">
             {/* Prev */}
@@ -221,7 +223,6 @@ export default async function Page({ params }) {
               ← Prev
             </Link>
 
-            {/* Page Numbers */}
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .filter(
@@ -258,7 +259,6 @@ export default async function Page({ params }) {
                 )}
             </div>
 
-            {/* Next */}
             <Link
               href={page < totalPages ? pageHref(page + 1) : '#'}
               aria-disabled={page >= totalPages}
@@ -273,6 +273,36 @@ export default async function Page({ params }) {
           </nav>
         )}
       </section>
+
+      {isAdmin && (
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
+          <form action={deleteBookAction}>
+            <input type="hidden" name="bookId" value={id} />
+            <button
+              type="submit"
+              className="bg-red-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-gray-800 transition"
+              title="Delete Book"
+            >
+              <Trash2 className="size-5" />
+            </button>
+          </form>
+          <Link
+            href={{
+              pathname: `/update/book/${book.id}`,
+              query: {
+                title: book.title,
+                authorId: book.author?.id,
+                publishedDate: book.publishedDate?.slice(0, 10),
+                description: book.description,
+              },
+            }}
+            aria-label="Edit Book"
+            className="bg-black text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-gray-800 transition"
+          >
+            <Pencil className="w-5 h-5" />
+          </Link>
+        </div>
+      )}
     </>
   );
 }

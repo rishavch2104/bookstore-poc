@@ -3,21 +3,21 @@ import gql from 'graphql-tag';
 export const userTypeDefs = gql`
   type User {
     id: ID!
-    name: String!
-    userName: String!
+    email: String!
+    role: UserRole!
   }
   extend type User {
     reviews(limit: Int = 10, offset: Int = 0): ReviewList!
   }
 
   input CreateUserInput {
-    name: String!
-    userName: String!
+    email: String!
+    password: String!
+    role: UserRole
   }
 
   input UpdateUserInput {
-    name: String
-    userName: String
+    email: String
   }
 
   input DeleteUserInput {
