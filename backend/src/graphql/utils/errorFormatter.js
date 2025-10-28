@@ -8,7 +8,7 @@ import { GraphQLError } from 'graphql';
 
 export function formatError(formattedError, error) {
   const original = error.originalError;
-
+  console.log(original);
   const toGQLError = (message, code, extra = {}) =>
     new GraphQLError(message, {
       nodes: error.nodes,

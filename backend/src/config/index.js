@@ -5,7 +5,7 @@ export const config = {
   port: process.env.PORT || 4000,
   db: {
     uri:
-      process.env.DATABASE_URL ||
+      process.env.PG_DATABASE_URL ||
       'postgres://myuser:mypassword@localhost:5432/mydatabase',
     logging: process.env.DB_LOGGING === 'true',
     mongouri: process.env.MONGODB_URI || 'mongodb://localhost:27017/booksdb',
