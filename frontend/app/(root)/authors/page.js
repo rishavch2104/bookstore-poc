@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { getClient } from '../../../lib/apolloClient.js';
 
-import SearchForm from '../../../components/SearchForm.jsx';
+import SearchForm from '../../../components/SearchForm.js';
 import AuthorCard from '../../../components/AuthorCard.js';
 import { gql } from '@apollo/client';
 export const dynamic = 'force-dynamic';
