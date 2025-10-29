@@ -44,7 +44,7 @@ const BookCard = ({ book, isAdmin }) => {
         </div>
         <Link href={`/author/${author?.id}`}>
           <Image
-            src="https://placehold.co/48x48"
+            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400&auto=format&fit=crop"
             alt="placeholder"
             width={48}
             height={48}
@@ -56,7 +56,7 @@ const BookCard = ({ book, isAdmin }) => {
       <Link href={`/book/${id}`}>
         <p className="book-card_desc">{description}</p>
         <Image
-          src="https://placehold.co/300x200"
+          src="https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=300&auto=format&fit=crop"
           alt="placeholder"
           width={300}
           height={200}
