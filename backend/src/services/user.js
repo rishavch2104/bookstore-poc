@@ -1,29 +1,4 @@
 import { GraphQLError } from 'graphql';
-import { buildUserWhere } from './filters.js';
-
-function buildUserOrder(orderBy = []) {
-  if (!orderBy?.length) return [['id', 'ASC']];
-  const mapField = (f) => {
-    switch (f) {
-      case 'ID':
-        return 'id';
-      case 'NAME':
-        return 'name';
-      case 'USERNAME':
-        return 'userName';
-      case 'CREATED_AT':
-        return 'createdAt';
-      case 'UPDATED_AT':
-        return 'updatedAt';
-      default:
-        return 'id';
-    }
-  };
-  return orderBy.map(({ field, direction }) => [
-    mapField(field),
-    direction || 'ASC',
-  ]);
-}
 
 export function makeUserService({ User, Review, sequelize }) {
   return {

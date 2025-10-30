@@ -1,4 +1,9 @@
 import { GraphQLError } from 'graphql';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
+const TOKEN_EXPIRY = '7d';
 export function assertNoConflicts({ exact, from, to, field }) {
   if (exact != null && (from != null || to != null)) {
     throw new GraphQLError(
@@ -52,4 +57,24 @@ export function isLoggedIn(user) {
       extensions: { code: 'UNAUTHENTICATED' },
     });
   }
+}
+
+export function generateToken(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    },
+    JWT_SECRET,
+    { expiresIn: TOKEN_EXPIRY }
+  );
+}
+
+export async function hashPassword(password) {
+  return await bcrypt.hash(password, 10);
+}
+
+export async function isPasswordValid(password, toComparePassword) {
+  return await bcrypt.compare(password, toComparePassword);
 }
