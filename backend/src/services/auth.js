@@ -1,21 +1,5 @@
 import { GraphQLError } from 'graphql';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
-const TOKEN_EXPIRY = '7d';
-
-function generateToken(user) {
-  return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    },
-    JWT_SECRET,
-    { expiresIn: TOKEN_EXPIRY }
-  );
-}
+import { generateToken, hashPassword, isPasswordValid } from './utils.js';
 
 export function makeAuthService({ User }) {
   return {
@@ -27,7 +11,7 @@ export function makeAuthService({ User }) {
           extensions: { code: 'BAD_USER_INPUT' },
         });
       }
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await hashPassword(password);
       const user = await User.create(
         { email, password: hashedPassword, name, role },
         { transaction }
@@ -50,7 +34,7 @@ export function makeAuthService({ User }) {
         });
       }
 
-      const valid = await bcrypt.compare(password, user.password);
+      const valid = await isPasswordValid(password, user.password);
 
       if (!valid) {
         throw new GraphQLError('Invalid email or password', {
